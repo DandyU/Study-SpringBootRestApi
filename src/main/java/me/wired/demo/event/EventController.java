@@ -1,5 +1,6 @@
 package me.wired.demo.event;
 
+        import org.modelmapper.ModelMapper;
         import org.springframework.hateoas.MediaTypes;
         import org.springframework.http.ResponseEntity;
         import org.springframework.stereotype.Controller;
@@ -17,13 +18,21 @@ package me.wired.demo.event;
 public class EventController {
 
     private final EventRepository eventRepository;
+    private final ModelMapper modelMapper;
 
-    public EventController(EventRepository eventRepository) {
+    public EventController(EventRepository eventRepository, ModelMapper modelMapper) {
         this.eventRepository = eventRepository;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping//("/api/events")
-    public ResponseEntity createEvent(@RequestBody Event event) {
+    public ResponseEntity createEvent(@RequestBody EventDto eventDto) {
+        /*Event event = Event.builder()
+                .name(eventDto.getName())
+                .description((eventDto.getDescription()))
+                .build();*/
+        Event event = modelMapper.map(eventDto, Event.class);
+
         Event newEvent = this.eventRepository.save(event);
         //URI createdUri = linkTo(methodOn(EventController.class).createEvent(null)).slash("{id}").toUri();
         //URI createdUri = linkTo(EventController.class).slash("{id}").toUri();

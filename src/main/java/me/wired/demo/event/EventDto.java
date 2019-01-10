@@ -1,26 +1,15 @@
 package me.wired.demo.event;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@EqualsAndHashCode(of = {"id", "name"})
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Data
-@Entity()
-public class Event {
-    @Id @GeneratedValue
-    private Integer id;
-    private boolean offline;
-    private boolean free;
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private EventStatus eventStatus = EventStatus.DRAFT;
+@Builder @NoArgsConstructor @AllArgsConstructor
+public class EventDto {
 
     private String name;
     private String description;
@@ -32,4 +21,5 @@ public class Event {
     private int basePrice; // (optional)
     private int maxPrice; // (optional)
     private int limitOfEnrollment;
+
 }
