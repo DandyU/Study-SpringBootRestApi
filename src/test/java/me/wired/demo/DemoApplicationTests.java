@@ -1,5 +1,6 @@
 package me.wired.demo;
 
+import me.wired.demo.common.TestDescription;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

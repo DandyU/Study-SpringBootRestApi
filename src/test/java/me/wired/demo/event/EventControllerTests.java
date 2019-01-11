@@ -1,6 +1,7 @@
 package me.wired.demo.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.wired.demo.common.TestDescription;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +37,7 @@ public class EventControllerTests {
     //EventRepository eventRepository;
 
     @Test
+    @TestDescription("테스트 설명")
     public void createEvent() throws Exception {
         EventDto event = EventDto.builder()
                 //.id(100)
@@ -72,6 +74,7 @@ public class EventControllerTests {
     }
 
     @Test
+    @TestDescription("테스트 설명")
     public void createUnexpectedPropertiesErrorEvent() throws Exception {
         Event event = Event.builder()
                 .id(100)
@@ -108,6 +111,7 @@ public class EventControllerTests {
     }
 
    @Test
+   @TestDescription("테스트 설명")
     public void createRequiredPropertiesErrorEvent() throws Exception {
        EventDto eventDto = EventDto.builder().build();
 
@@ -119,4 +123,29 @@ public class EventControllerTests {
                .andDo(print())
                .andExpect(status().isBadRequest());
    }
+
+    @Test
+    @TestDescription("테스트 설명")
+    public void createRequiredPropertiesErrorEvent2() throws Exception {
+        EventDto eventDto = EventDto.builder()
+                //.id(100)
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2019, 1, 8, 1, 2))
+                .closeEnrollmentDateTime(LocalDateTime.of(2019, 1, 31, 1, 2))
+                .beginEventDateTime(LocalDateTime.of(2019, 1, 31, 1, 2)) // error
+                .endEventDateTime(LocalDateTime.of(2019, 1, 8, 1, 2)) // error
+                .basePrice(10000) // error
+                .maxPrice(200) // error
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타텁 팩토리")
+                .build();
+
+        this.mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 }
