@@ -4,10 +4,12 @@ package me.wired.demo.event;
         import org.springframework.hateoas.MediaTypes;
         import org.springframework.http.ResponseEntity;
         import org.springframework.stereotype.Controller;
+        import org.springframework.validation.Errors;
         import org.springframework.web.bind.annotation.PostMapping;
         import org.springframework.web.bind.annotation.RequestBody;
         import org.springframework.web.bind.annotation.RequestMapping;
 
+        import javax.validation.Valid;
         import java.net.URI;
 
         import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -25,8 +27,14 @@ public class EventController {
         this.modelMapper = modelMapper;
     }
 
+
+    // @Valid Annotation을 사용하면 오브젝트에 바인딩할 때 검증을 구행할 수 있음
     @PostMapping//("/api/events")
-    public ResponseEntity createEvent(@RequestBody EventDto eventDto) {
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
         /*Event event = Event.builder()
                 .name(eventDto.getName())
                 .description((eventDto.getDescription()))

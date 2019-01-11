@@ -72,7 +72,7 @@ public class EventControllerTests {
     }
 
     @Test
-    public void createBadEvent() throws Exception {
+    public void createUnexpectedPropertiesErrorEvent() throws Exception {
         Event event = Event.builder()
                 .id(100)
                 .name("Spring")
@@ -93,9 +93,9 @@ public class EventControllerTests {
 
 
         mockMvc.perform(post("/api/events/")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .accept(MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(event)))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON)
+                        .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 //.andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
@@ -106,4 +106,17 @@ public class EventControllerTests {
                 //.andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
         ;
     }
+
+   @Test
+    public void createRequiredPropertiesErrorEvent() throws Exception {
+       EventDto eventDto = EventDto.builder().build();
+
+
+       this.mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON)
+                        .content(objectMapper.writeValueAsString(eventDto)))
+               .andDo(print())
+               .andExpect(status().isBadRequest());
+   }
 }
