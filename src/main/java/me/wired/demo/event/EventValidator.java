@@ -12,6 +12,7 @@ public class EventValidator {
         if (eventDto.getBasePrice() > eventDto.getMaxPrice()) {
             errors.rejectValue("basePrice", "wrongValue", "defaultMessage");
             errors.rejectValue("maxPrice", "wrongValue", "defaultMessage");
+            errors.reject("wrongPrices", "Value of prices wrong");
         }
 
         LocalDateTime endEventDateTime = eventDto.getEndEventDateTime();
@@ -19,6 +20,7 @@ public class EventValidator {
                 endEventDateTime.isBefore(eventDto.getCloseEnrollmentDateTime()) ||
                 endEventDateTime.isBefore((eventDto.getBeginEventDateTime()))) {
             errors.rejectValue("endEventDateTime", "wrongValue", "defaultMessage");
+            errors.reject("wrongendEventDateTime", "Value of prices wrong");
         }
 
         LocalDateTime beginEventDateTime = eventDto.getBeginEventDateTime();
@@ -26,6 +28,7 @@ public class EventValidator {
                 beginEventDateTime.isAfter(eventDto.getCloseEnrollmentDateTime()) ||
                 beginEventDateTime.isBefore(eventDto.getBeginEnrollmentDateTime())) {
             errors.rejectValue("beginEventDateTime", "wrongValue", "defaultMessage");
+            errors.reject("wrongbeginEventDateTime", "Value of prices wrong");
         }
 
         LocalDateTime closeEnrollmentDateTime = eventDto.getCloseEnrollmentDateTime();
@@ -33,6 +36,7 @@ public class EventValidator {
                 closeEnrollmentDateTime.isBefore(eventDto.getEndEventDateTime()) ||
                 closeEnrollmentDateTime.isBefore(eventDto.getBeginEventDateTime())) {
             errors.rejectValue("closeEnrollmentDateTime", "wrongValue", "defaultMessage");
+            errors.reject("wrongcloseEnrollmentDateTime", "Value of prices wrong");
         }
 
 

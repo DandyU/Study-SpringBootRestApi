@@ -146,6 +146,12 @@ public class EventControllerTests {
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].objectName").exists())
+                //.andExpect(jsonPath("$[0].field").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+                //.andExpect(jsonPath("$[0].rejectedValue").exists())
+        ;
     }
 }

@@ -1,19 +1,18 @@
 package me.wired.demo.event;
 
-        import org.modelmapper.ModelMapper;
-        import org.springframework.hateoas.MediaTypes;
-        import org.springframework.http.ResponseEntity;
-        import org.springframework.stereotype.Controller;
-        import org.springframework.validation.Errors;
-        import org.springframework.web.bind.annotation.PostMapping;
-        import org.springframework.web.bind.annotation.RequestBody;
-        import org.springframework.web.bind.annotation.RequestMapping;
+import org.modelmapper.ModelMapper;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-        import javax.validation.Valid;
-        import java.net.URI;
+import javax.validation.Valid;
+import java.net.URI;
 
-        import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-        import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @Controller
 @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
@@ -34,12 +33,14 @@ public class EventController {
     @PostMapping//("/api/events")
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            //return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            //return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         /*Event event = Event.builder()
@@ -47,7 +48,6 @@ public class EventController {
                 .description((eventDto.getDescription()))
                 .build();*/
         Event event = modelMapper.map(eventDto, Event.class);
-
         Event newEvent = this.eventRepository.save(event);
         //URI createdUri = linkTo(methodOn(EventController.class).createEvent(null)).slash("{id}").toUri();
         //URI createdUri = linkTo(EventController.class).slash("{id}").toUri();
