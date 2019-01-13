@@ -5,6 +5,8 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.apache.logging.log4j.ThreadContext.isEmpty;
+
 @Getter
 @Setter
 @EqualsAndHashCode(of = {"id", "name"})
@@ -32,4 +34,18 @@ public class Event {
     private int basePrice; // (optional)
     private int maxPrice; // (optional)
     private int limitOfEnrollment;
+
+    public void update() {
+        if (this.basePrice == 0 && this.maxPrice == 0) {
+            this.free = true;
+        } else {
+            this.free = false;
+        }
+
+        if (this.location == null || this.location.trim().isEmpty()) {
+            this.offline = false;
+        } else {
+            this.offline = true;
+        }
+    }
 }

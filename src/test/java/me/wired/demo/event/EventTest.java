@@ -1,5 +1,6 @@
 package me.wired.demo.event;
 
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
@@ -35,4 +36,57 @@ public class EventTest {
         assertThat(event.getName().equals("홍길동"));
     }
 
+    @Test
+    public void testFree() {
+        // Given
+        Event event = Event.builder()
+                .basePrice(0)
+                .maxPrice(0)
+                .build();
+        // When
+        event.update();
+        // Then
+        AssertionsForClassTypes.assertThat(event.isFree()).isTrue();
+
+        // Given
+        event = Event.builder()
+                .basePrice(100)
+                .maxPrice(0)
+                .build();
+        // When
+        event.update();
+        // Then
+        AssertionsForClassTypes.assertThat(event.isFree()).isFalse();
+
+        // Given
+        event = Event.builder()
+                .basePrice(0)
+                .maxPrice(100)
+                .build();
+        // When
+        event.update();
+        // Then
+        AssertionsForClassTypes.assertThat(event.isFree()).isFalse();
+    }
+
+    @Test
+    public void testOffline() {
+        // Given
+        Event event = Event.builder()
+                .location("마곡")
+                .build();
+        // When
+        event.update();
+        // Then
+        AssertionsForClassTypes.assertThat(event.isOffline()).isTrue();
+
+        // Given
+        event = Event.builder()
+                .build();
+        // When
+        event.update();
+        // Then
+        AssertionsForClassTypes.assertThat(event.isOffline()).isFalse();
+
+    }
 }
