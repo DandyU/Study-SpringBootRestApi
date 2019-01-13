@@ -1,7 +1,8 @@
-package me.wired.demo.event;
+package me.wired.demo.events;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -43,7 +44,7 @@ public class EventController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        /*Event event = Event.builder()
+        /*Event events = Event.builder()
                 .name(eventDto.getName())
                 .description((eventDto.getDescription()))
                 .build();*/
@@ -52,7 +53,14 @@ public class EventController {
         Event newEvent = this.eventRepository.save(event);
         //URI createdUri = linkTo(methodOn(EventController.class).createEvent(null)).slash("{id}").toUri();
         //URI createdUri = linkTo(EventController.class).slash("{id}").toUri();
-        URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
-        return ResponseEntity.created(createdUri).body(newEvent);
+
+        ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        URI createdUri = selfLinkBuilder.toUri();
+        EventResource eventResource = new EventResource(newEvent);
+        eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        //eventResource.add(selfLinkBuilder.withSelfRel()); Move EventResource.class
+        eventResource.add(selfLinkBuilder.withRel("update-events"));
+
+        return ResponseEntity.created(createdUri).body(eventResource);
     }
 }

@@ -1,4 +1,4 @@
-package me.wired.demo.event;
+package me.wired.demo.events;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

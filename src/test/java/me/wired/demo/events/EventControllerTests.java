@@ -1,16 +1,12 @@
-package me.wired.demo.event;
+package me.wired.demo.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.wired.demo.common.TestDescription;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -56,7 +52,7 @@ public class EventControllerTests {
                 //.offline(false)
                 //.eventStatus(EventStatus.PUBLISHED)
                 .build();
-        //Mockito.when(eventRepository.save(event)).thenReturn(event);
+        //Mockito.when(eventRepository.save(events)).thenReturn(events);
 
 
         mockMvc.perform(post("/api/events/")
@@ -73,6 +69,9 @@ public class EventControllerTests {
                 .andExpect(jsonPath("free").value(false))
                 .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-events").exists())
         ;
     }
 
@@ -95,7 +94,7 @@ public class EventControllerTests {
                 .offline(false)
                 .eventStatus(EventStatus.PUBLISHED)
                 .build();
-        //Mockito.when(eventRepository.save(event)).thenReturn(event);
+        //Mockito.when(eventRepository.save(events)).thenReturn(events);
 
 
         mockMvc.perform(post("/api/events/")

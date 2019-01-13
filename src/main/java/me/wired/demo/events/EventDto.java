@@ -1,4 +1,4 @@
-package me.wired.demo.event;
+package me.wired.demo.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,11 +1,9 @@
-package me.wired.demo.event;
+package me.wired.demo.events;
 
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
-import static org.apache.logging.log4j.ThreadContext.isEmpty;
 
 @Getter
 @Setter
