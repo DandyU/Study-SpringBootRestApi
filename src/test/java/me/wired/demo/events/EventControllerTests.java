@@ -78,14 +78,16 @@ public class EventControllerTests {
                 .andExpect(jsonPath("free").value(false))
                 .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
-                .andExpect(jsonPath("_links.self").exists())
-                .andExpect(jsonPath("_links.query-events").exists())
-                .andExpect(jsonPath("_links.update-events").exists())
+                /*.andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.query-events.href").exists())
+                .andExpect(jsonPath("_links.update-events.href").exists())
+                .andExpect(jsonPath("_links.profile.href").exists())*/
                 .andDo(document("create-event",
                         // add link snippet
                         links(linkWithRel("self").description("link to self"),
                                 linkWithRel("query-events").description("link to query event"),
-                                linkWithRel("update-events").description("link to update event")),
+                                linkWithRel("update-events").description("link to update event"),
+                                linkWithRel("profile").description("link to profile")),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("accept header"),
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
@@ -124,7 +126,8 @@ public class EventControllerTests {
                                 fieldWithPath("eventStatus").description("eventStatus of new event"),
                                 fieldWithPath("_links.self.href").description("link to self"),
                                 fieldWithPath("_links.query-events.href").description("link to query-events"),
-                                fieldWithPath("_links.update-events.href").description("linke to update-events")
+                                fieldWithPath("_links.update-events.href").description("linke to update-events"),
+                                fieldWithPath("_links.profile.href").description("link to profile")
                         )
                 ))
         ;
