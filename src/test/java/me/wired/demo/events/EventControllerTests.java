@@ -64,7 +64,6 @@ public class EventControllerTests {
                 .build();
         //Mockito.when(eventRepository.save(events)).thenReturn(events);
 
-
         mockMvc.perform(post("/api/events/")
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .accept(MediaTypes.HAL_JSON)
