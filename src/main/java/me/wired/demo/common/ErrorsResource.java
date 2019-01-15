@@ -1,6 +1,5 @@
 package me.wired.demo.common;
 
-import me.wired.demo.events.EventController;
 import me.wired.demo.index.IndexController;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;

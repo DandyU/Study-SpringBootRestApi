@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
@@ -25,6 +26,9 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -44,6 +48,8 @@ public class EventControllerTests {
     ObjectMapper objectMapper;
     //@MockBean
     //EventRepository eventRepository;
+    @Autowired
+    EventRepository eventRepository;
 
     @Test
     @TestDescription("테스트 설명")
@@ -216,6 +222,91 @@ public class EventControllerTests {
                 //.andExpect(jsonPath("$[0].rejectedValue").exists())
                 .andExpect(jsonPath("_links.index").exists())
         ;
+    }
+
+    @Test
+    @TestDescription("30개의 이벤트를 10개씩 두 번째 페이지 조회하기")
+    public void getEvents() throws Exception {
+        // Given
+        IntStream.range(0, 30).forEach(this::generateEvent);
+
+        // When
+        this.mockMvc.perform(get("/api/events")
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "name,DESC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_embedded.eventList[0]._links.self").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("get-events",
+                                // add link snippet
+                                links(linkWithRel("self").description("link to self"),
+                                linkWithRel("profile").description("link to profile"),
+                                linkWithRel("next").description("Move next page"),
+                                linkWithRel("last").description("Move last page"),
+                                linkWithRel("prev").description("Move previous page"),
+                                linkWithRel("first").description("Move first page")),
+                                requestParameters(
+                                        parameterWithName("page").description("list page"),
+                                        parameterWithName("size").description("list length"),
+                                        parameterWithName("sort").description("Sort type(e.g. [key],[ASC|DESC])")
+                                ),
+                                responseHeaders(
+                                        headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+                                ),
+                                responseFields(
+                                        fieldWithPath("_embedded.eventList[0].id").description("ID of new event"),
+                                        fieldWithPath("_embedded.eventList[0].name").description("Name of new event"),
+                                        fieldWithPath("_embedded.eventList[0].description").description("description of new event"),
+                                        fieldWithPath("_embedded.eventList[0].beginEnrollmentDateTime").description("beginEnrollmentDateTime of new event"),
+                                        fieldWithPath("_embedded.eventList[0].closeEnrollmentDateTime").description("closeEnrollmentDateTime of new event"),
+                                        fieldWithPath("_embedded.eventList[0].beginEventDateTime").description("beginEventDateTime of new event"),
+                                        fieldWithPath("_embedded.eventList[0].endEventDateTime").description("endEventDateTime of new event"),
+                                        fieldWithPath("_embedded.eventList[0].location").description("location of new event"),
+                                        fieldWithPath("_embedded.eventList[0].basePrice").description("basePrice of new event"),
+                                        fieldWithPath("_embedded.eventList[0].maxPrice").description("maxPrice of new event"),
+                                        fieldWithPath("_embedded.eventList[0].limitOfEnrollment").description("limitOfEnrollment of new event"),
+                                        fieldWithPath("_embedded.eventList[0].free").description("free of new event"),
+                                        fieldWithPath("_embedded.eventList[0].offline").description("offline of new event"),
+                                        fieldWithPath("_embedded.eventList[0].eventStatus").description("eventStatus of new event"),
+                                        fieldWithPath("_embedded.eventList[0]._links.self.href").description("link to self"),
+                                        fieldWithPath("_links.self.href").description("link to self"),
+                                        fieldWithPath("_links.profile.href").description("link to profile"),
+                                        fieldWithPath("_links.next.href").description("link to next page"),
+                                        fieldWithPath("_links.last.href").description("link to last page"),
+                                        fieldWithPath("_links.prev.href").description("link to prev page"),
+                                        fieldWithPath("_links.first.href").description("link to first page"),
+                                        fieldWithPath("page.size").description("page size"),
+                                        fieldWithPath("page.totalElements").description("page total elements"),
+                                        fieldWithPath("page.totalPages").description("total pages"),
+                                        fieldWithPath("page.number").description("number")
+
+                                )
+                        )
+                )
+        ;
+    }
+
+    private void generateEvent(int i) {
+        Event event = Event.builder()
+                .name("Spring-" + i)
+                .description("REST API Development with Spring-" + i)
+                .beginEnrollmentDateTime(LocalDateTime.of(2019, 1, 8, 1, 2))
+                .closeEnrollmentDateTime(LocalDateTime.of(2019, 1, 31, 1, 2))
+                .beginEventDateTime(LocalDateTime.of(2019, 1, 8, 1, 2))
+                .endEventDateTime(LocalDateTime.of(2019, 1, 31, 1, 2))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강서구 마곡동 " + i)
+                .free(false)
+                .offline(false)
+                .eventStatus(EventStatus.PUBLISHED)
+                .build();
+        this.eventRepository.save(event);
     }
 
 }
