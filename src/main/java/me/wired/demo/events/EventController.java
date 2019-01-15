@@ -1,5 +1,6 @@
 package me.wired.demo.events;
 
+import me.wired.demo.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
@@ -36,13 +37,15 @@ public class EventController {
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
         if (errors.hasErrors()) {
             //return ResponseEntity.badRequest().build();
-            return ResponseEntity.badRequest().body(errors);
+            //return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
 
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
             //return ResponseEntity.badRequest().build();
-            return ResponseEntity.badRequest().body(errors);
+            //return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
 
         /*Event events = Event.builder()
@@ -64,5 +67,9 @@ public class EventController {
         eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
 
         return ResponseEntity.created(createdUri).body(eventResource);
+    }
+
+    private ResponseEntity badRequest(Errors errors) {
+        return ResponseEntity.badRequest().body(new ErrorsResource(errors));
     }
 }
