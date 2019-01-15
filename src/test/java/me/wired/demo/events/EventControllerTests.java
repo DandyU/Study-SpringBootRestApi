@@ -422,8 +422,8 @@ public class EventControllerTests {
                 .andDo(document("update-event",
                         // add link snippet
                         links(linkWithRel("self").description("link to self"),
-                                linkWithRel("query-events").description("link to query event"),
-                                linkWithRel("update-events").description("link to update event"),
+                                //linkWithRel("query-events").description("link to query event"),
+                                //linkWithRel("update-events").description("link to update event"),
                                 linkWithRel("profile").description("link to profile")),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("accept header"),
@@ -461,8 +461,8 @@ public class EventControllerTests {
                                 fieldWithPath("offline").description("offline of new event"),
                                 fieldWithPath("eventStatus").description("eventStatus of new event"),
                                 fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.query-events.href").description("link to query-events"),
-                                fieldWithPath("_links.update-events.href").description("linke to update-events"),
+                                //fieldWithPath("_links.query-events.href").description("link to query-events"),
+                                //fieldWithPath("_links.update-events.href").description("linke to update-events"),
                                 fieldWithPath("_links.profile.href").description("link to profile")
                         )
                 ));

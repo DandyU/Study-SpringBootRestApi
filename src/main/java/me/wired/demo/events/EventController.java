@@ -117,8 +117,8 @@ public class EventController {
         URI eventSelfUri = selfLinkBuilder.toUri();
 
         EventResource eventResource = new EventResource(savedEvent);
-        eventResource.add(linkTo(EventController.class).withRel("query-events"));
-        eventResource.add(selfLinkBuilder.withRel("update-events"));
+        //eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        //eventResource.add(selfLinkBuilder.withRel("update-events"));
         eventResource.add(new Link("/docs/index.html#resources-events-update").withRel("profile"));
         return ResponseEntity.ok(eventResource);
     }
