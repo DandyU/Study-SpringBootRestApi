@@ -290,7 +290,32 @@ public class EventControllerTests {
         ;
     }
 
-    private void generateEvent(int i) {
+    @Test
+    @TestDescription("없는 이벤트 조회했을 때 404 응답받기")
+    public void getEvent404() throws Exception {
+        // When & Then
+        mockMvc.perform(get("/api/events/{id}", 12345))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @TestDescription("이벤트 한 개 조회하기")
+    public void getEvent() throws Exception {
+        // Given;
+        Event event = this.generateEvent(100);
+
+        // When & Then
+        mockMvc.perform(get("/api/events/{id}", event.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("get-event"))
+                ;
+    }
+
+    private Event generateEvent(int i) {
         Event event = Event.builder()
                 .name("Spring-" + i)
                 .description("REST API Development with Spring-" + i)
@@ -306,7 +331,7 @@ public class EventControllerTests {
                 .offline(false)
                 .eventStatus(EventStatus.PUBLISHED)
                 .build();
-        this.eventRepository.save(event);
+        return this.eventRepository.save(event);
     }
 
 }
