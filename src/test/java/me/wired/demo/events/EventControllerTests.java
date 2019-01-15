@@ -5,6 +5,7 @@ import me.wired.demo.common.RestDocsConfiguration;
 import me.wired.demo.common.TestDescription;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,6 +31,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -46,6 +48,8 @@ public class EventControllerTests {
     MockMvc mockMvc;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    ModelMapper modelMapper;
     //@MockBean
     //EventRepository eventRepository;
     @Autowired
@@ -293,7 +297,6 @@ public class EventControllerTests {
     @Test
     @TestDescription("없는 이벤트 조회했을 때 404 응답받기")
     public void getEvent404() throws Exception {
-        // When & Then
         mockMvc.perform(get("/api/events/{id}", 12345))
                 .andExpect(status().isNotFound());
     }
@@ -313,6 +316,113 @@ public class EventControllerTests {
                 .andExpect(jsonPath("_links.profile").exists())
                 .andDo(document("get-event"))
                 ;
+    }
+
+    @Test
+    @TestDescription("없는 이벤트 조회했을 때 404 응답받기")
+    public void updateEvent404() throws Exception {
+        // Given
+        Integer id = 99999;
+        EventDto eventDto = EventDto.builder()
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2019, 1, 8, 1, 2))
+                .closeEnrollmentDateTime(LocalDateTime.of(2019, 1, 31, 1, 2))
+                .beginEventDateTime(LocalDateTime.of(2019, 1, 8, 1, 2))
+                .endEventDateTime(LocalDateTime.of(2019, 1, 31, 1, 2))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타텁 팩토리")
+                //.free(false)
+                //.offline(false)
+                //.eventStatus(EventStatus.PUBLISHED)
+                .build();
+
+        // When & Then
+        mockMvc.perform(
+                put("/api/events/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON)
+                        .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @TestDescription("이벤트 수정하기")
+    public void updateEvent() throws Exception {
+        // Given
+        Event event = this.generateEvent(1004);
+        EventDto eventDto = modelMapper.map(event, EventDto.class);
+        eventDto.setName("New Name");
+        eventDto.setDescription("New Description");
+
+        mockMvc.perform(
+                put("/api/events/{id}", event.getId())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON)
+                        .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+                //.andExpect(jsonPath("id").exists());
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("free").value(false))
+                .andExpect(jsonPath("offline").value(true))
+                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+                /*.andExpect(jsonPath("_links.self.href").exists())
+                .andExpect(jsonPath("_links.query-events.href").exists())
+                .andExpect(jsonPath("_links.update-events.href").exists())
+                .andExpect(jsonPath("_links.profile.href").exists())*/
+                .andDo(document("update-event",
+                        // add link snippet
+                        links(linkWithRel("self").description("link to self"),
+                                linkWithRel("query-events").description("link to query event"),
+                                linkWithRel("update-events").description("link to update event"),
+                                linkWithRel("profile").description("link to profile")),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("description of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime of new event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime of new event"),
+                                fieldWithPath("beginEventDateTime").description("beginEventDateTime of new event"),
+                                fieldWithPath("endEventDateTime").description("endEventDateTime of new event"),
+                                fieldWithPath("location").description("location of new event"),
+                                fieldWithPath("basePrice").description("basePrice of new event"),
+                                fieldWithPath("maxPrice").description("maxPrice of new event"),
+                                fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new event")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+                        ),
+                        //relaxedResponseFields(
+                        responseFields(
+                                fieldWithPath("id").description("ID of new event"),
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("description of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime of new event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime of new event"),
+                                fieldWithPath("beginEventDateTime").description("beginEventDateTime of new event"),
+                                fieldWithPath("endEventDateTime").description("endEventDateTime of new event"),
+                                fieldWithPath("location").description("location of new event"),
+                                fieldWithPath("basePrice").description("basePrice of new event"),
+                                fieldWithPath("maxPrice").description("maxPrice of new event"),
+                                fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new event"),
+                                fieldWithPath("free").description("free of new event"),
+                                fieldWithPath("offline").description("offline of new event"),
+                                fieldWithPath("eventStatus").description("eventStatus of new event"),
+                                fieldWithPath("_links.self.href").description("link to self"),
+                                fieldWithPath("_links.query-events.href").description("link to query-events"),
+                                fieldWithPath("_links.update-events.href").description("linke to update-events"),
+                                fieldWithPath("_links.profile.href").description("link to profile")
+                        )
+                ));
     }
 
     private Event generateEvent(int i) {
