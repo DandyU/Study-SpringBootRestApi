@@ -96,7 +96,10 @@ public class EventController {
 
     @PutMapping("/{id}")
     public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody @Valid EventDto eventDto, Errors errors) {
-        if (!this.eventRepository.existsById(id))
+        //if (!this.eventRepository.existsById(id))
+        //    return ResponseEntity.notFound().build();
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        if (!optionalEvent.isPresent())
             return ResponseEntity.notFound().build();
 
         if (errors.hasErrors())
@@ -106,14 +109,14 @@ public class EventController {
         if (errors.hasErrors())
             return badRequest((errors));
 
-        Event event = modelMapper.map(eventDto, Event.class);
-        event.setId(id);
-        event.update();
-        Event newEvent = this.eventRepository.save(event);
+        Event existingEvent = optionalEvent.get();
+        modelMapper.map(eventDto, existingEvent);
+        Event savedEvent = this.eventRepository.save(existingEvent);
 
-        ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(savedEvent.getId());
         URI eventSelfUri = selfLinkBuilder.toUri();
-        EventResource eventResource = new EventResource(newEvent);
+
+        EventResource eventResource = new EventResource(savedEvent);
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
         eventResource.add(selfLinkBuilder.withRel("update-events"));
         eventResource.add(new Link("/docs/index.html#resources-events-update").withRel("profile"));
