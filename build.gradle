@@ -42,17 +42,20 @@ repositories {
 
 
 dependencies {
-    compileOnly('org.projectlombok:lombok')
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation('org.springframework.boot:spring-boot-starter-hateoas')
     implementation('org.springframework.boot:spring-boot-starter-web')
-    //runtimeOnly('com.h2database:h2')
     runtimeOnly('org.postgresql:postgresql')
+    //runtimeOnly('com.h2database:h2')
     //compileOnly('org.postgresql:postgresql')
-    testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+    compile('org.modelmapper:modelmapper:2.3.2')
+    compile('org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.1.RELEASE')
+    compileOnly('org.projectlombok:lombok')
     testCompile('pl.pragmatists:JUnitParams:1.1.1')
     testRuntimeOnly('com.h2database:h2')
-    compile('org.modelmapper:modelmapper:2.3.2')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
     asciidoctor('org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.3.RELEASE')
+
 }
