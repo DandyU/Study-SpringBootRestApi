@@ -1,6 +1,7 @@
 package me.wired.demo.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.wired.demo.common.BaseControllerTest;
 import me.wired.demo.common.RestDocsConfiguration;
 import me.wired.demo.common.TestDescription;
 import org.junit.Test;
@@ -35,23 +36,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
-//@WebMvcTest // Web용 Bean만 등록을 해줌
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-@Import(RestDocsConfiguration.class)
-@ActiveProfiles("test")
-public class EventControllerTests {
+public class EventControllerTests extends BaseControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    ObjectMapper objectMapper;
-    @Autowired
-    ModelMapper modelMapper;
-    //@MockBean
-    //EventRepository eventRepository;
     @Autowired
     EventRepository eventRepository;
 

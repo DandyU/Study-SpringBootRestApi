@@ -1,6 +1,7 @@
 package me.wired.demo.events;
 
 import lombok.*;
+import me.wired.demo.accounts.Account;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,6 +32,8 @@ public class Event {
     private int basePrice; // (optional)
     private int maxPrice; // (optional)
     private int limitOfEnrollment;
+    @ManyToOne
+    private Account manager;
 
     public void update() {
         if (this.basePrice == 0 && this.maxPrice == 0) {
