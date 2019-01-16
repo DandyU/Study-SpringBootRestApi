@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -26,8 +27,12 @@ public class AccountServiceTest {
 
     @Autowired
     AccountService accountService;
+
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Test
     @TestDescription("User 이름 검색")
@@ -44,13 +49,15 @@ public class AccountServiceTest {
                 .password(password)
                 .roles(roleSet)
                 .build();
-        accountRepository.save(account);
+        //accountRepository.save(account);
+        // Set password encoding
+        accountService.saveAccount(account);
 
         // When
         UserDetails userDetails = accountService.loadUserByUsername(userName);
 
         // Then
-        assertThat(userDetails.getPassword()).isEqualTo(password);
+        assertThat(passwordEncoder.matches(password, userDetails.getPassword())).isTrue();
     }
 
     // # 1. 아래처럼 작성하면 하나의 Exception만 처리할 수 있음
