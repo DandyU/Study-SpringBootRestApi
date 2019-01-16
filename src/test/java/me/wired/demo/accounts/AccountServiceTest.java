@@ -61,7 +61,7 @@ public class AccountServiceTest {
         accountService.loadUserByUsername(username);
     }*/
 
-    // # 2. 아래와 같이하면 좀더 많은 Exception을 처리할 수 있음, 코드가 좀 복잡
+    // # 2. 아래와 같이하면 여러 Exception을 처리할 수 있음, 코드가 좀 복잡
    /*@Test
     @TestDescription("User 이름 검색")
     public void findByUsernameNotFound() {
