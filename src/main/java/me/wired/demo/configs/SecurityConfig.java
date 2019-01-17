@@ -63,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         ;
     }*/
 
-    // Resource 서버에서 비슷하게 설정할 거라 주석처리
+    // Resource 서버 설정 시에 다시 설정함
     /*@Override
     protected void configure(HttpSecurity http) throws Exception {
         http.anonymous()
