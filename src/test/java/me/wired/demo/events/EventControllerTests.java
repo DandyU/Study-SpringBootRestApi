@@ -262,6 +262,7 @@ public class EventControllerTests extends BaseControllerTest {
                                         fieldWithPath("_embedded.eventList[0].free").description("free of new event"),
                                         fieldWithPath("_embedded.eventList[0].offline").description("offline of new event"),
                                         fieldWithPath("_embedded.eventList[0].eventStatus").description("eventStatus of new event"),
+                                        fieldWithPath("_embedded.eventList[0].manager").description("manager of new event"),
                                         fieldWithPath("_embedded.eventList[0]._links.self.href").description("link to self"),
                                         fieldWithPath("_links.self.href").description("link to self"),
                                         fieldWithPath("_links.profile.href").description("link to profile"),
