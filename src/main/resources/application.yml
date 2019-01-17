@@ -25,7 +25,6 @@ logging:
           descriptor.sql.BasicBinder: TRACE
       springframework:
           security: DEBUG
-
 my-app:
   admin-username: "admin@email.com"
   admin-password: "admin"
