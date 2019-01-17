@@ -1,6 +1,9 @@
 package me.wired.demo.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.wired.demo.accounts.Account;
+import me.wired.demo.accounts.AccountRole;
+import me.wired.demo.accounts.AccountService;
 import me.wired.demo.common.BaseControllerTest;
 import me.wired.demo.common.RestDocsConfiguration;
 import me.wired.demo.common.TestDescription;
@@ -8,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,11 +19,17 @@ import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -30,6 +40,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -40,6 +51,9 @@ public class EventControllerTests extends BaseControllerTest {
 
     @Autowired
     EventRepository eventRepository;
+
+    @Autowired
+    AccountService accountService;
 
     @Test
     @TestDescription("테스트 설명")
@@ -63,6 +77,7 @@ public class EventControllerTests extends BaseControllerTest {
         //Mockito.when(eventRepository.save(events)).thenReturn(events);
 
         mockMvc.perform(post("/api/events/")
+                .header(HttpHeaders.AUTHORIZATION, OAuth2AccessToken.BEARER_TYPE + " " + getAccessToken())
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .accept(MediaTypes.HAL_JSON)
                     .content(objectMapper.writeValueAsString(event)))
@@ -119,6 +134,7 @@ public class EventControllerTests extends BaseControllerTest {
                                 fieldWithPath("basePrice").description("basePrice of new event"),
                                 fieldWithPath("maxPrice").description("maxPrice of new event"),
                                 fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new event"),
+                                fieldWithPath("manager").description("manager of new event"),
                                 fieldWithPath("free").description("free of new event"),
                                 fieldWithPath("offline").description("offline of new event"),
                                 fieldWithPath("eventStatus").description("eventStatus of new event"),
@@ -129,6 +145,31 @@ public class EventControllerTests extends BaseControllerTest {
                         )
                 ))
         ;
+    }
+
+    private String getAccessToken() throws Exception {
+        // OAuth2의 Grant Type 중 Password, Refresh Token만 지원
+        String clientId = "ourService";
+        String clientSecret = "secret";
+        String username = "henry@gmail.com";
+        String password = "12345";
+
+        Account yuseon = Account.builder()
+                .email(username)
+                .password(password)
+                .roles(new HashSet<>(Arrays.asList(AccountRole.ADMIN, AccountRole.USER)))
+                .build();
+        accountService.saveAccount(yuseon);
+
+        ResultActions resultActions = this.mockMvc.perform(post("/oauth/token")
+                .with(httpBasic(clientId, clientSecret))
+                .param("username", username)
+                .param("password", password)
+                .param("grant_type", "password"))
+                .andDo(print());
+        String responseData = resultActions.andReturn().getResponse().getContentAsString();
+        Jackson2JsonParser parser = new Jackson2JsonParser();
+        return parser.parseMap(responseData).get(OAuth2AccessToken.ACCESS_TOKEN).toString();
     }
 
     @Test
