@@ -305,7 +305,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("없는 이벤트 조회했을 때 404 응답받기")
+    @TestDescription("없는 이벤트 업데이트 요청했을 때 404 응답받기")
     public void updateEvent404() throws Exception {
         // Given
         Integer id = 99999;
@@ -316,8 +316,8 @@ public class EventControllerTests extends BaseControllerTest {
                 .closeEnrollmentDateTime(LocalDateTime.of(2019, 1, 31, 1, 2))
                 .beginEventDateTime(LocalDateTime.of(2019, 1, 8, 1, 2))
                 .endEventDateTime(LocalDateTime.of(2019, 1, 31, 1, 2))
-                .basePrice(100)
-                .maxPrice(200)
+                .basePrice(100) // Error
+                .maxPrice(200) // Error
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타텁 팩토리")
                 //.free(false)
@@ -337,13 +337,54 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("이벤트 수정하기")
-    public void updateEvent() throws Exception {
+    @TestDescription("빈 이벤트를 업데이트한 경우")
+    public void updateEvent400Empty() throws Exception {
         // Given
         Event event = this.generateEvent(1004);
-        EventDto eventDto = modelMapper.map(event, EventDto.class);
-        eventDto.setName("New Name");
-        eventDto.setDescription("New Description");
+        EventDto eventDto = new EventDto();
+
+        // When & Then
+        mockMvc.perform(
+                put("/api/events/{id}", event.getId())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON)
+                        .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @TestDescription("이벤트 업데이트 입력 값이 잘못된 경우 400 응답받기")
+    public void updateEvent400Wrong() throws Exception {
+        // Given
+        // Given
+        Event event = this.generateEvent(1004);
+        EventDto eventDto = this.modelMapper.map(event, EventDto.class);
+        eventDto.setBasePrice(2000);
+        eventDto.setMaxPrice(1000);
+
+        // When & Then
+        mockMvc.perform(
+                put("/api/events/{id}", event.getId())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON)
+                        .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @TestDescription("이벤트 정상적으로 수정하기")
+    public void updateEvent() throws Exception {
+        // Given
+        String newName = "New Name";
+        String newDescription = "New Description";
+        Event event = this.generateEvent(1004);
+        EventDto eventDto = this.modelMapper.map(event, EventDto.class);
+        eventDto.setName(newName);
+        eventDto.setDescription(newDescription);
 
         mockMvc.perform(
                 put("/api/events/{id}", event.getId())
@@ -355,9 +396,11 @@ public class EventControllerTests extends BaseControllerTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
                 //.andExpect(jsonPath("id").exists());
                 .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("name").value(newName))
+                .andExpect(jsonPath("description").value(newDescription))
                 .andExpect(jsonPath("free").value(false))
-                .andExpect(jsonPath("offline").value(true))
-                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+                .andExpect(jsonPath("offline").value(false))
+                .andExpect(jsonPath("eventStatus").value(EventStatus.PUBLISHED.name()))
                 /*.andExpect(jsonPath("_links.self.href").exists())
                 .andExpect(jsonPath("_links.query-events.href").exists())
                 .andExpect(jsonPath("_links.update-events.href").exists())
@@ -365,8 +408,8 @@ public class EventControllerTests extends BaseControllerTest {
                 .andDo(document("update-event",
                         // add link snippet
                         links(linkWithRel("self").description("link to self"),
-                                linkWithRel("query-events").description("link to query event"),
-                                linkWithRel("update-events").description("link to update event"),
+                                //linkWithRel("query-events").description("link to query event"),
+                                //linkWithRel("update-events").description("link to update event"),
                                 linkWithRel("profile").description("link to profile")),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("accept header"),
@@ -404,8 +447,8 @@ public class EventControllerTests extends BaseControllerTest {
                                 fieldWithPath("offline").description("offline of new event"),
                                 fieldWithPath("eventStatus").description("eventStatus of new event"),
                                 fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.query-events.href").description("link to query-events"),
-                                fieldWithPath("_links.update-events.href").description("linke to update-events"),
+                                //fieldWithPath("_links.query-events.href").description("link to query-events"),
+                                //fieldWithPath("_links.update-events.href").description("linke to update-events"),
                                 fieldWithPath("_links.profile.href").description("link to profile")
                         )
                 ));

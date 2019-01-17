@@ -23,6 +23,8 @@ logging:
         SQL: DEBUG
         type:
           descriptor.sql.BasicBinder: TRACE
+      springframework:
+          security: DEBUG
 
 ---
 spring:

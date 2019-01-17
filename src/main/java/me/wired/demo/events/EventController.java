@@ -68,7 +68,7 @@ public class EventController {
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
         //eventResource.add(selfLinkBuilder.withSelfRel()); Move EventResource.class
         eventResource.add(selfLinkBuilder.withRel("update-events"));
-        eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
+        eventResource.add(new Link("/static/docs/index.html#resources-events-create").withRel("profile"));
 
         return ResponseEntity.created(createdUri).body(eventResource);
     }
@@ -78,7 +78,7 @@ public class EventController {
         Page<Event> page = this.eventRepository.findAll(pageable);
         //PagedResources<Resource<Event>> resources = assembler.toResource(page);
         PagedResources<Resource<Event>> resources = assembler.toResource(page, e -> new EventResource(e));
-        resources.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
+        resources.add(new Link("/static/docs/index.html#resources-events-list").withRel("profile"));
         return ResponseEntity.ok(resources);
     }
 
@@ -90,13 +90,16 @@ public class EventController {
 
         Event event = optionalEvent.get();
         EventResource eventResource = new EventResource(event);
-        eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
+        eventResource.add(new Link("/static/docs/index.html#resources-events-get").withRel("profile"));
         return ResponseEntity.ok(eventResource);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody @Valid EventDto eventDto, Errors errors) {
-        if (!this.eventRepository.existsById(id))
+        //if (!this.eventRepository.existsById(id))
+        //    return ResponseEntity.notFound().build();
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        if (!optionalEvent.isPresent())
             return ResponseEntity.notFound().build();
 
         if (errors.hasErrors())
@@ -106,17 +109,17 @@ public class EventController {
         if (errors.hasErrors())
             return badRequest((errors));
 
-        Event event = modelMapper.map(eventDto, Event.class);
-        event.setId(id);
-        event.update();
-        Event newEvent = this.eventRepository.save(event);
+        Event existingEvent = optionalEvent.get();
+        modelMapper.map(eventDto, existingEvent);
+        Event savedEvent = this.eventRepository.save(existingEvent);
 
-        ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(savedEvent.getId());
         URI eventSelfUri = selfLinkBuilder.toUri();
-        EventResource eventResource = new EventResource(newEvent);
-        eventResource.add(linkTo(EventController.class).withRel("query-events"));
-        eventResource.add(selfLinkBuilder.withRel("update-events"));
-        eventResource.add(new Link("/docs/index.html#resources-events-update").withRel("profile"));
+
+        EventResource eventResource = new EventResource(savedEvent);
+        //eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        //eventResource.add(selfLinkBuilder.withRel("update-events"));
+        eventResource.add(new Link("/static/docs/index.html#resources-events-update").withRel("profile"));
         return ResponseEntity.ok(eventResource);
     }
 
