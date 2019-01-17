@@ -1,7 +1,9 @@
 package me.wired.demo.events;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import me.wired.demo.accounts.Account;
+import me.wired.demo.accounts.AccountSerializer;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -33,6 +35,7 @@ public class Event {
     private int maxPrice; // (optional)
     private int limitOfEnrollment;
     @ManyToOne
+    @JsonSerialize(using = AccountSerializer.class)
     private Account manager;
 
     public void update() {
