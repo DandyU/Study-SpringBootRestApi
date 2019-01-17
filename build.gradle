@@ -53,9 +53,9 @@ dependencies {
     compile('org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.1.RELEASE')
     compileOnly('org.projectlombok:lombok')
     testCompile('pl.pragmatists:JUnitParams:1.1.1')
+    testCompile('org.springframework.security:spring-security-test')
     testRuntimeOnly('com.h2database:h2')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
     asciidoctor('org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.3.RELEASE')
-
 }

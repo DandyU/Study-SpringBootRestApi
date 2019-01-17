@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,9 +41,7 @@ public class AccountServiceTest {
         // Given
         String userName = "henry@gmail.com";
         String password = "12345";
-        Set<AccountRole> roleSet = new HashSet<>();
-        roleSet.add(AccountRole.ADMIN);
-        roleSet.add(AccountRole.USER);
+        Set<AccountRole> roleSet = new HashSet<>(Arrays.asList(AccountRole.ADMIN, AccountRole.USER));
 
         Account account = Account.builder()
                 .email(userName)

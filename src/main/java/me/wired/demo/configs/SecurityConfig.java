@@ -63,7 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         ;
     }*/
 
-    @Override
+    // Resource 서버에서 비슷하게 설정할 거라 주석처리
+    /*@Override
     protected void configure(HttpSecurity http) throws Exception {
         http.anonymous()
         .and()
@@ -73,5 +74,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .mvcMatchers(HttpMethod.GET, "/api/**").authenticated()
         .anyRequest().authenticated()
         ;
-    }
+    }*/
 }
