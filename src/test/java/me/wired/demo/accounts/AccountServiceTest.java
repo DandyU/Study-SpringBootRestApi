@@ -1,5 +1,6 @@
 package me.wired.demo.accounts;
 
+import me.wired.demo.common.AppProperties;
 import me.wired.demo.common.TestDescription;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
@@ -35,22 +36,24 @@ public class AccountServiceTest {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    AppProperties appProperties;
+
     @Test
     @TestDescription("User 이름 검색")
     public void findByUsername() {
         // Given
-        String userName = "henry@gmail.com";
-        String password = "12345";
-        Set<AccountRole> roleSet = new HashSet<>(Arrays.asList(AccountRole.ADMIN, AccountRole.USER));
-
-        Account account = Account.builder()
+        String userName = appProperties.getUserUsername();
+        String password = appProperties.getUserPassword();
+        //Set<AccountRole> roleSet = new HashSet<>(Arrays.asList(AccountRole.ADMIN, AccountRole.USER));
+        /*Account account = Account.builder()
                 .email(userName)
                 .password(password)
                 .roles(roleSet)
-                .build();
+                .build();*/
         //accountRepository.save(account);
         // Set password encoding
-        accountService.saveAccount(account);
+        //accountService.saveAccount(account);
 
         // When
         UserDetails userDetails = accountService.loadUserByUsername(userName);
@@ -86,7 +89,7 @@ public class AccountServiceTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    @TestDescription("User 이름 검색")
+    @TestDescription("존재하지 않는 User 이름 검색")
     public void findByUsernameNotFound() {
         String username = "emptyUsername";
 

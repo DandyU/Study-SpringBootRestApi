@@ -1,8 +1,10 @@
 package me.wired.demo.configs;
 
 import me.wired.demo.accounts.Account;
+import me.wired.demo.accounts.AccountRepository;
 import me.wired.demo.accounts.AccountRole;
 import me.wired.demo.accounts.AccountService;
+import me.wired.demo.common.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -12,7 +14,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Configuration
@@ -36,20 +40,35 @@ public class AppConfig {
             @Autowired
             AccountService accountService;
 
+            @Autowired
+            AccountRepository accountRepository;
+
+            @Autowired
+            AppProperties appProperties;
+
             @Override
             public void run(ApplicationArguments args) throws Exception {
-                Set<AccountRole> roleSet = new HashSet<>();
-                roleSet.add(AccountRole.ADMIN);
-                roleSet.add(AccountRole.USER);
+                Account account;
+                String email = appProperties.getAdminUsername();
+                if (!accountRepository.findByEmail(email).isPresent()) {
+                    account = Account.builder()
+                            .email(email)
+                            .password(appProperties.getAdminPassword())
+                            .roles(new HashSet<>(Arrays.asList(AccountRole.ADMIN)))
+                            .build();
+                    accountService.saveAccount(account);
+                }
 
-                Account yuseon = Account.builder()
-                        .email("yuseon@email.com")
-                        .password("yuseon")
-                        .roles(roleSet)
-                        .build();
-                accountService.saveAccount(yuseon);
+                email = appProperties.getUserUsername();
+                if (!accountRepository.findByEmail(email).isPresent()) {
+                    account = Account.builder()
+                            .email(email)
+                            .password(appProperties.getUserPassword())
+                            .roles(new HashSet<>(Arrays.asList(AccountRole.USER)))
+                            .build();
+                    accountService.saveAccount(account);
+                }
             }
-
         };
     }
 }

@@ -3,6 +3,7 @@ package me.wired.demo.events;
 import me.wired.demo.accounts.Account;
 import me.wired.demo.accounts.AccountRole;
 import me.wired.demo.accounts.AccountService;
+import me.wired.demo.common.AppProperties;
 import me.wired.demo.common.BaseControllerTest;
 import me.wired.demo.common.TestDescription;
 import org.junit.Test;
@@ -43,6 +44,9 @@ public class EventControllerTests extends BaseControllerTest {
 
     @Autowired
     AccountService accountService;
+
+    @Autowired
+    AppProperties appProperties;
 
     @Test
     @TestDescription("테스트 설명")
@@ -138,10 +142,10 @@ public class EventControllerTests extends BaseControllerTest {
 
     private String getBearerToken() throws Exception {
         // OAuth2의 Grant Type 중 Password, Refresh Token만 지원
-        String clientId = "ourService";
-        String clientSecret = "secret";
-        String username = "henry@gmail.com";
-        String password = "12345";
+        String clientId = appProperties.getClientId();
+        String clientSecret = appProperties.getClientSecret();
+        String username = appProperties.getUserUsername();
+        String password = appProperties.getUserPassword();
         try {
             accountService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {

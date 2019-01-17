@@ -3,6 +3,7 @@ package me.wired.demo.configs;
 import me.wired.demo.accounts.Account;
 import me.wired.demo.accounts.AccountRole;
 import me.wired.demo.accounts.AccountService;
+import me.wired.demo.common.AppProperties;
 import me.wired.demo.common.BaseControllerTest;
 import me.wired.demo.common.TestDescription;
 import org.junit.Test;
@@ -26,21 +27,24 @@ public class AuthServerConfigTest extends BaseControllerTest {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    AppProperties appProperties;
+
     @Test
     @TestDescription("인증 토큰을 발급받는 테스트")
     public void getAuthToken() throws Exception {
         // OAuth2의 Grant Type 중 Password, Refresh Token만 지원
-        String clientId = "ourService";
-        String clientSecret = "secret";
-        String username = "henry@gmail.com";
-        String password = "12345";
+        String clientId = appProperties.getClientId();
+        String clientSecret = appProperties.getClientSecret();
+        String username = appProperties.getUserUsername();
+        String password = appProperties.getUserPassword();
 
-        Account yuseon = Account.builder()
+        /*Account yuseon = Account.builder()
                 .email(username)
                 .password(password)
                 .roles(new HashSet<>(Arrays.asList(AccountRole.ADMIN, AccountRole.USER)))
                 .build();
-        accountService.saveAccount(yuseon);
+        accountService.saveAccount(yuseon);*/
 
         this.mockMvc.perform(post("/oauth/token")
                 .with(httpBasic(clientId, clientSecret))
